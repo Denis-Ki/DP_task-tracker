@@ -10,7 +10,8 @@ class User(AbstractUser):
     username = models.CharField(
         max_length=150,
         verbose_name='ФИО',
-        help_text='введите ФИО'
+        help_text='введите ФИО',
+        **NULLABLE,
     )
 
     email = models.EmailField(

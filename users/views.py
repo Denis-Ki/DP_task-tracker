@@ -5,7 +5,7 @@ from users.serializer import UserSerializer
 
 
 # Create your views here.
-class UserCreateRetrieveUpdateDestroyAPIView(viewsets.ModelViewSet):
+class UserAPIView(viewsets.ModelViewSet):
     serializer_class = UserSerializer
     queryset = User.objects.all()
 

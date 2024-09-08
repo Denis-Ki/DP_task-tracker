@@ -3,27 +3,16 @@ from datetime import datetime
 from django.db import models
 from phonenumber_field.modelfields import PhoneNumberField
 
+from users.models import User
+
 NULLABLE = {"blank": True, "null": True}
 
-DEPARTMENTS = [
-    ('Отдел электроники', 'Отдел электроники'),
-    ('Отдел программирования', 'Отдел программирования'),
-    ('Конструкторский отдел ', 'Конструкторский отдел'),
-    ('Математический отдел ', 'Математический отдел'),
-]
-
-POSITIONS = [
-    ('Инженер 1 категории', 'Инженер 1 категории'),
-    ('Инженер 2 категории', 'Инженер 2 категории'),
-    ('Инженер 3 категории', 'Инженер 3 категории'),
-    ('Начальник отдела', 'Начальник отдела'),
-]
-
-STATUSES = [
-    ('Открыта', 'Открыта'),
-    ('В исполении', 'В исполении'),
-    ('Закрыта', 'Закрыта'),
-]
+# DEPARTMENTS = [
+#     ('Отдел электроники', 'Отдел электроники'),
+#     ('Отдел программирования', 'Отдел программирования'),
+#     ('Конструкторский отдел ', 'Конструкторский отдел'),
+#     ('Математический отдел ', 'Математический отдел'),
+# ]
 
 
 # class Department(models.Model):
@@ -43,6 +32,16 @@ STATUSES = [
 
 
 class Employee(models.Model):
+    POSITION_CAT1 = 'category 1'
+    POSITION_CAT2 = 'category 2'
+    POSITION_CAT3 = 'category 3'
+    MANAGER = 'manager'
+    POSITIONS = [
+        (POSITION_CAT1, 'Инженер 1 категории'),
+        (POSITION_CAT2, 'Инженер 2 категории'),
+        (POSITION_CAT3, 'Инженер 3 категории'),
+        (MANAGER, 'Начальник отдела'),
+    ]
     name = models.CharField(
         max_length=150,
         verbose_name='ФИО',
@@ -51,6 +50,7 @@ class Employee(models.Model):
     position = models.CharField(
         max_length=50,
         choices=POSITIONS,
+        default=POSITION_CAT3,
         verbose_name="Должность",
         help_text='выберите должность'
     )
@@ -66,13 +66,18 @@ class Employee(models.Model):
         help_text='введите служебный email сотрудника'
     )
     phone_number = PhoneNumberField(
-        verbose_name="Телефон",
+        verbose_name='Телефон',
         **NULLABLE,
         help_text='введите номер телефона'
     )
+    vacation_status = models.BooleanField(
+        default=False,
+        verbose_name='Статус отпуска',
+        help_text='статус нахождения в отпуске'
+    )
 
     def __str__(self):
-        return f'{self.name}, {self.department}, {self.position}, {self.email}'
+        return f'{self.name}, {self.position}, {self.email}'
 
     class Meta:
         verbose_name = 'Сотрудник'
@@ -80,6 +85,15 @@ class Employee(models.Model):
 
 
 class Task(models.Model):
+    STATUS_OPEN = "open"
+    STATUS_IN_PROGRESS = "in_progress"
+    STATUS_DONE = "done"
+    STATUSES = [
+        (STATUS_OPEN, 'Открыта'),
+        (STATUS_IN_PROGRESS, 'В исполении'),
+        (STATUS_DONE, 'Закрыта'),
+    ]
+
     title = models.CharField(
         max_length=150,
         verbose_name='Название задачи',
@@ -112,9 +126,23 @@ class Task(models.Model):
     status = models.CharField(
         max_length=50,
         choices=STATUSES,
-        default='Открыта',
+        default=STATUS_OPEN,
         verbose_name="Статус",
         help_text='выберите статус задачи'
+    )
+    owner = models.ForeignKey(
+        User,
+        **NULLABLE,
+        on_delete=models.CASCADE,
+        verbose_name="Создатель",
+    )
+    is_active = models.BooleanField(
+        default=True,
+        verbose_name="Признак активности задачи"
+    )
+    is_important = models.BooleanField(
+        default=False,
+        verbose_name="Признак важности задачи"
     )
     # department = models.ForeignKey(
     #     Department,
@@ -128,7 +156,7 @@ class Task(models.Model):
         return self.deadline < datetime.date.today()
 
     def __str__(self):
-        return f'{self.title}'
+        return f'{self.title}: {self.status}'
 
     class Meta:
         verbose_name = 'Задача'
