@@ -26,6 +26,7 @@ INSTALLED_APPS = [
     "django.contrib.messages",
     "django.contrib.staticfiles",
     "rest_framework",
+    "rest_framework.authtoken",
     "rest_framework_simplejwt",
     "django_celery_beat",
     "phonenumber_field",
@@ -120,3 +121,8 @@ AUTH_USER_MODEL = "users.User"
 APPEND_SLASH = False
 
 PHONENUMBER_DEFAULT_REGION = 'RU'
+
+SIMPLE_JWT = {
+    "ACCESS_TOKEN_LIFETIME": timedelta(minutes=20),
+    "REFRESH_TOKEN_LIFETIME": timedelta(days=1),
+}

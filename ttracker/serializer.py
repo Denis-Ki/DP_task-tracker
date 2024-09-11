@@ -1,8 +1,10 @@
 from django.db.models import Q
 from rest_framework.fields import SerializerMethodField
 from rest_framework.serializers import ModelSerializer
+from rest_framework.validators import UniqueTogetherValidator
 
 from ttracker.models import Employee, Task
+from ttracker.validators import TitleValidator
 
 
 class EmployeeSerializer(ModelSerializer):
@@ -12,10 +14,10 @@ class EmployeeSerializer(ModelSerializer):
 
 
 class EmployeeActiveTasksSerializer(ModelSerializer):
-    count_active_tasks = SerializerMethodField()
+    active_tasks_count = SerializerMethodField()
     tasks = SerializerMethodField()
 
-    def get_count_active_tasks(self, employee):
+    def get_active_tasks_count(self, employee):
         return Task.objects.filter(Q(executor=employee.id), Q(is_active=True)).count()
 
     def get_tasks(self, employee):
@@ -28,13 +30,17 @@ class EmployeeActiveTasksSerializer(ModelSerializer):
 
     class Meta:
         model = Employee
-        fields = ("name", "tasks", "count_active_tasks")
+        fields = ("name", "tasks", "active_tasks_count")
 
 
 class TaskSerializer(ModelSerializer):
     class Meta:
         model = Task
         fields = "__all__"
+        validators = [
+            TitleValidator(field="title"),
+            UniqueTogetherValidator(fields=["title"], queryset=Task.objects.all()),
+        ]
 
 
 class TaskCreateSerializer(ModelSerializer):
@@ -48,3 +54,17 @@ class TaskListSerializer(ModelSerializer):
     class Meta:
         model = Task
         fields = "__all__"
+
+
+class ImportantTaskSerializer(ModelSerializer):
+    executor = SerializerMethodField()
+
+    class Meta:
+        model = Task
+        fields = ['title', 'deadline', 'executor']
+
+    def get_executor(self, task):
+        # Получение сотрудников для вывода ФИО
+        employees = self.context.get('employees', [])
+        return [employee.name for employee in employees]
+

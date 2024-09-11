@@ -1,0 +1,125 @@
+
+        [
+            
+            {
+                "model": "ttracker.employee",
+                "pk": 1,
+                "fields": {
+                    "name": "Иванов Алексей Сергеевич",
+                    "position": "category 1",
+                    "email": "user1@mail.ru",
+                    "phone_number": "+79164573897",
+                    "vacation_status": false
+                }
+            },
+            
+            {
+                "model": "ttracker.employee",
+                "pk": 2,
+                "fields": {
+                    "name": "Иванов Максим Алексеевич",
+                    "position": "category 1",
+                    "email": "user2@mail.ru",
+                    "phone_number": "+79830050720",
+                    "vacation_status": false
+                }
+            },
+            
+            {
+                "model": "ttracker.employee",
+                "pk": 3,
+                "fields": {
+                    "name": "Соколов Алексей Максимович",
+                    "position": "category 1",
+                    "email": "user3@mail.ru",
+                    "phone_number": "+79555063630",
+                    "vacation_status": false
+                }
+            },
+            
+            {
+                "model": "ttracker.employee",
+                "pk": 4,
+                "fields": {
+                    "name": "Смирнов Олег Иванович",
+                    "position": "category 2",
+                    "email": "user4@mail.ru",
+                    "phone_number": "+79457430155",
+                    "vacation_status": false
+                }
+            },
+            
+            {
+                "model": "ttracker.employee",
+                "pk": 5,
+                "fields": {
+                    "name": "Сидоров Олег Иванович",
+                    "position": "category 2",
+                    "email": "user5@mail.ru",
+                    "phone_number": "+79370991069",
+                    "vacation_status": true
+                }
+            },
+            
+            {
+                "model": "ttracker.employee",
+                "pk": 6,
+                "fields": {
+                    "name": "Иванов Дмитрий Иванович",
+                    "position": "category 2",
+                    "email": "user6@mail.ru",
+                    "phone_number": "+79965139682",
+                    "vacation_status": false
+                }
+            },
+            
+            {
+                "model": "ttracker.employee",
+                "pk": 7,
+                "fields": {
+                    "name": "Кузнецов Александр Александрович",
+                    "position": "category 3",
+                    "email": "user7@mail.ru",
+                    "phone_number": "+79745877489",
+                    "vacation_status": false
+                }
+            },
+            
+            {
+                "model": "ttracker.employee",
+                "pk": 8,
+                "fields": {
+                    "name": "Александров Максим Сергеевич",
+                    "position": "category 3",
+                    "email": "user8@mail.ru",
+                    "phone_number": "+79020302571",
+                    "vacation_status": true
+                }
+            },
+            
+            {
+                "model": "ttracker.employee",
+                "pk": 9,
+                "fields": {
+                    "name": "Иванов Иван Иванович",
+                    "position": "category 3",
+                    "email": "user9@mail.ru",
+                    "phone_number": "+79824315606",
+                    "vacation_status": false
+                }
+            },
+            
+            {
+                "model": "ttracker.employee",
+                "pk": 10,
+                "fields": {
+                    "name": "Соколов Дмитрий Алексеевич",
+                    "position": "category 3",
+                    "email": "user10@mail.ru",
+                    "phone_number": "+79565690099",
+                    "vacation_status": true
+                }
+            }
+            
+        ]
+        

@@ -140,10 +140,10 @@ class Task(models.Model):
         default=True,
         verbose_name="Признак активности задачи"
     )
-    is_important = models.BooleanField(
-        default=False,
-        verbose_name="Признак важности задачи"
-    )
+    # is_important = models.BooleanField(
+    #     default=False,
+    #     verbose_name="Признак важности задачи"
+    # )
     # department = models.ForeignKey(
     #     Department,
     #     on_delete=models.CASCADE,
@@ -151,9 +151,9 @@ class Task(models.Model):
     #     help_text='выберите отдел'
     # )
 
-    def is_overdue(self):
-        """просроченые задачи"""
-        return self.deadline < datetime.date.today()
+    # def is_overdue(self):
+    #     """просроченые задачи"""
+    #     return self.deadline < datetime.date.today()
 
     def __str__(self):
         return f'{self.title}: {self.status}'
