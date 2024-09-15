@@ -1,5 +1,4 @@
-from django.db.models import Count
-from django.shortcuts import render
+from django.db.models import Count, Q
 from rest_framework.response import Response
 from rest_framework import viewsets, generics, status
 from rest_framework.filters import SearchFilter
@@ -85,16 +84,13 @@ class ImportantTasksAPIView(generics.ListAPIView):
     def get_queryset(self):
         # Получаем важные задачи, которые не взяты в работу,
         # но от которых зависят другие задачи
-        important_tasks = Task.objects.filter(
+        return Task.objects.filter(
             status=Task.STATUS_OPEN,
-            is_active=True,
             parental_task__status=Task.STATUS_IN_PROGRESS
-        ).order_by('deadline')
-
-        return important_tasks
+        ).select_related('parental_task').order_by('deadline')
 
     def list(self, request, *args, **kwargs):
-        # Получаем важные задачи с помощью get_queryset
+        # Получаем важные задачи
         important_tasks = self.get_queryset()
 
         if not important_tasks.exists():
@@ -103,10 +99,12 @@ class ImportantTasksAPIView(generics.ListAPIView):
                 status=status.HTTP_404_NOT_FOUND
             )
 
-        # Находим сотрудников, которые не в отпуске, и их загруженность
+        # Получаем сотрудников, не находящихся в отпуске, с подсчетом их активных задач
         employees_with_task_count = Employee.objects.filter(
-            vacation_status=False  # Проверка, что сотрудник не в отпуске
-        ).annotate(task_count=Count('task')).order_by('task_count')
+            vacation_status=False
+        ).annotate(
+            task_count=Count('task', filter=Q(task__status=Task.STATUS_IN_PROGRESS))
+        ).order_by('task_count')
 
         if not employees_with_task_count.exists():
             return Response(
@@ -114,30 +112,29 @@ class ImportantTasksAPIView(generics.ListAPIView):
                 status=status.HTTP_404_NOT_FOUND
             )
 
-        # Находим наименее загруженного сотрудника
-        least_loaded_employee = employees_with_task_count.first()
+        # Преобразуем список сотрудников в итератор для циклического распределения
+        employees_list = list(employees_with_task_count)
+        least_loaded_employee = employees_list[0]
+        employee_index = 0  # Начальный индекс для распределения задач
 
         task_employee_mapping = []
-        employee_index = 0
 
         for task in important_tasks:
-            # Проверка на исполнителя родительской задачи
             parent_task = task.parental_task
             assigned_employee = None
 
             if parent_task and parent_task.executor:
-                # Получаем сотрудника, выполняющего родительскую задачу
                 parent_executor = parent_task.executor
 
-                # Проверяем, если у него не более чем на 2 задачи больше, чем у наименее загруженного сотрудника
-                if parent_executor.task_set.count() <= least_loaded_employee.task_count + 2:
+                # Проверяем загруженность исполнителя родительской задачи
+                if parent_executor.task_set.filter(status=Task.STATUS_IN_PROGRESS).count() <= least_loaded_employee.task_count + 2:
                     assigned_employee = parent_executor
 
-            # Если родительский сотрудник не подходит, назначаем наименее загруженного сотрудника
+            # Если родительский сотрудник не подходит, назначаем наименее загруженного
             if not assigned_employee:
-                if employee_index >= len(employees_with_task_count):
-                    employee_index = 0
-                assigned_employee = employees_with_task_count[employee_index]
+                if employee_index >= len(employees_list):
+                    employee_index = 0  # Перезапускаем индекс, если все сотрудники использованы
+                assigned_employee = employees_list[employee_index]
                 employee_index += 1
 
             # Добавляем задачу и сотрудника в список
@@ -146,11 +143,21 @@ class ImportantTasksAPIView(generics.ListAPIView):
                 "employee": assigned_employee
             })
 
-        # Сериализация данных
-        serializer = self.get_serializer([task["task"] for task in task_employee_mapping], many=True)
+        # Сериализация данных с передачей выбранного исполнителя для каждой задачи через контекст
+        serializer = self.get_serializer(
+            [task["task"] for task in task_employee_mapping],
+            many=True,
+            context={'employees': [task["employee"] for task in task_employee_mapping]}
+        )
+
+        # Формируем финальный результат с назначенным исполнителем
         result = []
         for i, data in enumerate(serializer.data):
-            data['executor'] = [task_employee_mapping[i]["employee"].name]
+            data['executor'] = task_employee_mapping[i]["employee"].name
             result.append(data)
 
         return Response(result, status=status.HTTP_200_OK)
+
+
+
+

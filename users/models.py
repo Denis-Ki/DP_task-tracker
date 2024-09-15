@@ -31,13 +31,6 @@ class User(AbstractUser):
         **NULLABLE
     )
 
-    # department = models.ForeignKey(
-    #     Department,
-    #     ** NULLABLE,
-    #     on_delete=models.CASCADE,
-    #     verbose_name="Отдел",
-    #     help_text='выберите отдел'
-    # )
 
     USERNAME_FIELD = "email"
     REQUIRED_FIELDS = []

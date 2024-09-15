@@ -13,30 +13,21 @@ class EmployeeSerializer(ModelSerializer):
         fields = "__all__"
 
 
-# class EmployeeActiveTasksSerializer(ModelSerializer):
-#     active_tasks_count = SerializerMethodField()
-#     tasks = SerializerMethodField()
-#
-#     def get_active_tasks_count(self, employee):
-#         return Task.objects.filter(Q(executor=employee.id), Q(is_active=True)).count()
-#
-#     def get_tasks(self, employee):
-#         tasks = Task.objects.filter(executor=employee.id)
-#         tasks_list = []
-#         for task in tasks:
-#             if task.is_active:
-#                 tasks_list.append(task.title)
-#         return tasks_list
-
 class EmployeeActiveTasksSerializer(ModelSerializer):
     count_active_tasks = SerializerMethodField()
     tasks = SerializerMethodField()
 
-    def get_count_active_tasks(self, employee):  # Считаем только активные задачи для текущего сотрудника
-        return Task.objects.filter(executor=employee.id, is_active=True).count()
+    def get_count_active_tasks(self, employee):  # Считаем только задачи в исполнении для текущего сотрудника
+        return Task.objects.filter(
+            executor=employee.id,
+            status=Task.STATUS_IN_PROGRESS
+        ).count()
 
     def get_tasks(self, employee): # Фильтруем задачи сразу по активности
-        tasks = Task.objects.filter(executor=employee.id, is_active=True).values_list('title', flat=True)
+        tasks = Task.objects.filter(
+            executor=employee.id,
+            status=Task.STATUS_IN_PROGRESS
+        ).values_list('title', flat=True)
         return list(tasks)
 
     class Meta:
