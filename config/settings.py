@@ -1,9 +1,6 @@
 import os
 from datetime import timedelta
-from pathlib import Path
-
 from dotenv import load_dotenv
-
 from pathlib import Path
 
 load_dotenv()
@@ -125,4 +122,17 @@ PHONENUMBER_DEFAULT_REGION = 'RU'
 SIMPLE_JWT = {
     "ACCESS_TOKEN_LIFETIME": timedelta(minutes=20),
     "REFRESH_TOKEN_LIFETIME": timedelta(days=1),
+}
+
+SWAGGER_SETTINGS = {
+   'SECURITY_DEFINITIONS': {
+      'Basic': {
+            'type': 'basic'
+      },
+      'Bearer': {
+            'type': 'apiKey',
+            'name': 'Authorization',
+            'in': 'header'
+      }
+   }
 }

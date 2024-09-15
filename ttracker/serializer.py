@@ -14,23 +14,27 @@ class EmployeeSerializer(ModelSerializer):
 
 
 class EmployeeActiveTasksSerializer(ModelSerializer):
-    active_tasks_count = SerializerMethodField()
+    count_active_tasks = SerializerMethodField()
     tasks = SerializerMethodField()
 
-    def get_active_tasks_count(self, employee):
-        return Task.objects.filter(Q(executor=employee.id), Q(is_active=True)).count()
+    def get_count_active_tasks(self, employee):
+        """Считает только задачи в исполнении для текущего сотрудника"""
+        return Task.objects.filter(
+            executor=employee.id,
+            status=Task.STATUS_IN_PROGRESS
+        ).count()
 
     def get_tasks(self, employee):
-        tasks = Task.objects.filter(executor=employee.id)
-        tasks_list = []
-        for task in tasks:
-            if task.is_active:
-                tasks_list.append(task.title)
-        return tasks_list
+        """Фильтруем задачи сразу по активности"""
+        tasks = Task.objects.filter(
+            executor=employee.id,
+            status=Task.STATUS_IN_PROGRESS
+        ).values_list('title', flat=True)
+        return list(tasks)
 
     class Meta:
         model = Employee
-        fields = ("name", "tasks", "active_tasks_count")
+        fields = ("name", "tasks", "count_active_tasks")
 
 
 class TaskSerializer(ModelSerializer):
@@ -64,7 +68,7 @@ class ImportantTaskSerializer(ModelSerializer):
         fields = ['title', 'deadline', 'executor']
 
     def get_executor(self, task):
-        # Получение сотрудников для вывода ФИО
+        """Получение сотрудников для вывода ФИО"""
         employees = self.context.get('employees', [])
         return [employee.name for employee in employees]
 

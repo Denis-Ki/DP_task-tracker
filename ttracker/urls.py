@@ -1,5 +1,5 @@
 from django.urls import path, include
-from rest_framework.routers import DefaultRouter
+from rest_framework.routers import SimpleRouter
 from ttracker.apps import TtrackerConfig
 from ttracker.views import (
     EmployeeAPIView,
@@ -13,12 +13,11 @@ from ttracker.views import (
 )
 app_name = TtrackerConfig.name
 
-router = DefaultRouter()
+router = SimpleRouter()
 router.register(r'employees', EmployeeAPIView, basename='employee')
 
-urlpatterns = [
-    path('', include(router.urls)),  # Включаем все URL для CRUD операций с сотрудниками
-    path('employees/active-tasks/', EmployeeActiveTasksListAPIView.as_view(), name='employee-active-tasks'),
+custom_urlpatterns = [
+    path('employees-active-tasks/', EmployeeActiveTasksListAPIView.as_view(), name='employee-active-tasks'),
     path('tasks/create/', TaskCreateAPIView.as_view(), name='task-create'),
     path('tasks/', TaskListAPIView.as_view(), name='task-list'),
     path('tasks/<int:pk>/', TaskRetrieveAPIView.as_view(), name='task-detail'),
@@ -26,4 +25,6 @@ urlpatterns = [
     path('tasks/<int:pk>/delete/', TaskDestroyAPIView.as_view(), name='task-delete'),
     path('tasks/important/', ImportantTasksAPIView.as_view(), name='important-tasks'),
 ]
+
+urlpatterns = router.urls + custom_urlpatterns
 

@@ -1,34 +1,9 @@
-from datetime import datetime
-
 from django.db import models
 from phonenumber_field.modelfields import PhoneNumberField
 
 from users.models import User
 
 NULLABLE = {"blank": True, "null": True}
-
-# DEPARTMENTS = [
-#     ('Отдел электроники', 'Отдел электроники'),
-#     ('Отдел программирования', 'Отдел программирования'),
-#     ('Конструкторский отдел ', 'Конструкторский отдел'),
-#     ('Математический отдел ', 'Математический отдел'),
-# ]
-
-
-# class Department(models.Model):
-#     title = models.CharField(
-#         max_length=50,
-#         choices=DEPARTMENTS,
-#         verbose_name="Отдел",
-#         help_text='выберите отдел'
-#     )
-#
-#     def __str__(self):
-#         return self.title
-#
-#     class Meta:
-#         verbose_name = 'Отдел'
-#         verbose_name_plural = 'Отделы'
 
 
 class Employee(models.Model):
@@ -54,12 +29,7 @@ class Employee(models.Model):
         verbose_name="Должность",
         help_text='выберите должность'
     )
-    # department = models.ForeignKey(
-    #     Department,
-    #     on_delete=models.CASCADE,
-    #     verbose_name="Отдел",
-    #     help_text='выберите отдел'
-    # )
+
     email = models.EmailField(
         verbose_name='Email',
         unique=True,
@@ -136,24 +106,6 @@ class Task(models.Model):
         on_delete=models.CASCADE,
         verbose_name="Создатель",
     )
-    is_active = models.BooleanField(
-        default=True,
-        verbose_name="Признак активности задачи"
-    )
-    # is_important = models.BooleanField(
-    #     default=False,
-    #     verbose_name="Признак важности задачи"
-    # )
-    # department = models.ForeignKey(
-    #     Department,
-    #     on_delete=models.CASCADE,
-    #     verbose_name="Отдел",
-    #     help_text='выберите отдел'
-    # )
-
-    # def is_overdue(self):
-    #     """просроченые задачи"""
-    #     return self.deadline < datetime.date.today()
 
     def __str__(self):
         return f'{self.title}: {self.status}'
