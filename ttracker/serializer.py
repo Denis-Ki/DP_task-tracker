@@ -17,13 +17,15 @@ class EmployeeActiveTasksSerializer(ModelSerializer):
     count_active_tasks = SerializerMethodField()
     tasks = SerializerMethodField()
 
-    def get_count_active_tasks(self, employee):  # Считаем только задачи в исполнении для текущего сотрудника
+    def get_count_active_tasks(self, employee):
+        """Считает только задачи в исполнении для текущего сотрудника"""
         return Task.objects.filter(
             executor=employee.id,
             status=Task.STATUS_IN_PROGRESS
         ).count()
 
-    def get_tasks(self, employee): # Фильтруем задачи сразу по активности
+    def get_tasks(self, employee):
+        """Фильтруем задачи сразу по активности"""
         tasks = Task.objects.filter(
             executor=employee.id,
             status=Task.STATUS_IN_PROGRESS
@@ -66,7 +68,7 @@ class ImportantTaskSerializer(ModelSerializer):
         fields = ['title', 'deadline', 'executor']
 
     def get_executor(self, task):
-        # Получение сотрудников для вывода ФИО
+        """Получение сотрудников для вывода ФИО"""
         employees = self.context.get('employees', [])
         return [employee.name for employee in employees]
 

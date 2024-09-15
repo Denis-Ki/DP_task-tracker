@@ -82,15 +82,15 @@ class ImportantTasksAPIView(generics.ListAPIView):
     serializer_class = ImportantTaskSerializer
 
     def get_queryset(self):
-        # Получаем важные задачи, которые не взяты в работу,
-        # но от которых зависят другие задачи
+        """Получает важные задачи, которые не взяты в работу,
+        но от которых зависят другие задачи"""
         return Task.objects.filter(
             status=Task.STATUS_OPEN,
             parental_task__status=Task.STATUS_IN_PROGRESS
         ).select_related('parental_task').order_by('deadline')
 
     def list(self, request, *args, **kwargs):
-        # Получаем важные задачи
+        """Получает список важных задач и исполнителей """
         important_tasks = self.get_queryset()
 
         if not important_tasks.exists():
